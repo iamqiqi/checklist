@@ -3,7 +3,7 @@ console.log('hello');
 $(document).ready(function(){
 	// Bind change event to all checkboxes, even if they are created later
 	$(document).on("change", "[type=checkbox]", function() {
-		var is_checked = $(this).is(":checked");
+		var is_checked = $(this).is("[type=checkbox]");
 		var item_id = $(this).attr("data-itemid");
 		var list_id = $("[data-listid]").attr("data-listid");
 
