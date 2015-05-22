@@ -7,14 +7,14 @@
 </head>
 <body>
 	<div>List name: {{ name }}</div>
-	<form action="/{{ id }}/add" method="post">
+	<form action="/{{ _id.toString() }}/add" method="post">
 		<input type="text" name="item_name">
 		<input type="submit" value="Add item">		
 	</form>
-	<div data-listid="{{ id }}">
+	<div data-listid="{{ _id.toString() }}">
 		{% for item in items %}
 			<div>
-				<input type="checkbox" data-itemid="{{ item.id }}" {% if item.checked %} checked {% endif %}> {{ item.itemname }}
+				<input type="checkbox" data-itemid="{{ item.itemid }}" {% if item.checked %} checked {% endif %}> {{ item.itemname }}
 			</div>
 		{% endfor %}
 	</div>
