@@ -14,7 +14,7 @@
 	<div data-listid="{{ _id.toString() }}">
 		{% for item in items %}
 			<div>
-				<input type="checkbox" data-itemid="{{ item.itemid }}" {% if item.checked %} checked {% endif %}> {{ item.itemname }}
+				<input type="checkbox" data-itemid="{{ item.itemid.toString() }}" {% if item.checked %} checked {% endif %}> {{ item.itemname }}
 			</div>
 		{% endfor %}
 	</div>

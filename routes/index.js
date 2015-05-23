@@ -53,32 +53,25 @@ router.post('/:id/add', function(req, res) {
 router.post('/:id/:itemid/:check', function(req, res) {
 	var collection = req.db.get('listcollection');
 	var id = req.params.id;
-	console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!???????????????id");
-	console.log(id);
 	var itemid = req.params.itemid;
-	console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!???????????????itemid");
-	console.log(itemid);
-	var a = typeof(itemid);
-	console.log("---------------a-------------------------",a);	
-	
 	var checkstatus = (req.params.check === "true");
-	console.log(checkstatus);	
+	console.log("checkstatus");
+	console.log(checkstatus);
 
 	collection.findById(id, {}, function(e, list){
 		for (var i = 0; i < list.items.length; i++) {
-			var itemid = req.params.itemid;
-			if (list.items[i].itemid === itemid) {
-				console.log(list.items[i].itemid);
-				collection.update({"_id": id}, { $set: {"items.i.checked": checkstatus} }, function(e, list) {
+			if (list.items[i].itemid == itemid) {
+				var change = {};
+				change["items." + i + ".checked"] = checkstatus;
+				console.log("change");	
+				console.log(change); 
+				collection.update({"_id": id}, { $set: change }, function(e, list) {
 					return res.redirect('/' + id);
-				});				
+				});
+				break;
 			}
-		} 
-    });	
-
-	// collection.update({"_id": id}, { $set: {"items.0.checked": checkstatus} }, function(e, list) {
-	// 	return res.redirect('/' + id);
-	// });
+		}
+	});
 });
 
 module.exports = router;

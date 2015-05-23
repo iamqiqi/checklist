@@ -1,13 +1,13 @@
 $(document).ready(function(){
 	// Bind change event to all checkboxes, even if they are created later
 	$(document).on("change", "[type=checkbox]", function() {
-		var is_checked = $(this).is("[type=checkbox]");
-		var item_name = $(this).attr("data-itemid");
+		var is_checked = $(this).is(":checked");
+		var item_id = $(this).attr("data-itemid");
 		var list_id = $("[data-listid]").attr("data-listid");
 
 		$.ajax({
 		  type: "POST",
-		  url: "/" + list_id + "/" + item_name + "/" + is_checked
+		  url: "/" + list_id + "/" + item_id + "/" + is_checked
 		});
 	});
 });
