@@ -15,6 +15,9 @@
 		{% for item in items %}
 			<div>
 				<input type="checkbox" data-itemid="{{ item.itemid.toString() }}" {% if item.checked %} checked {% endif %}> {{ item.itemname }}
+				<form action="/{{ _id.toString() }}/{{ item.itemid.toString() }}/delete" method="post">
+					<input type="submit" value="Delete">
+				</form>
 			</div>
 		{% endfor %}
 	</div>

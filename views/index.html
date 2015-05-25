@@ -12,6 +12,9 @@
 		{% for list in checklists %}
 			<div>
 				<a href="/{{list._id.toString()}}">{{ list.name }}</a>
+				<form action="/{{list._id.toString()}}/delete" method="post">
+					<input type="submit" value="Delete">
+				</form>
 			</div>
 		{% endfor %}
 	</div>

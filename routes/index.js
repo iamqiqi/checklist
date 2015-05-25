@@ -4,7 +4,7 @@ var checklists = {};
 var ObjectID = require('mongodb').ObjectID;
 
 
-/* GET home page. */
+// display index page with lists
 router.get('/', function(req, res, next) {
 	var collection = req.db.get('listcollection');
     collection.find({},{}, function(e, checklists) {
@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
     });
 });
 
-
+// add list
 router.post('/create', function(req, res) {
 	var collection = req.db.get('listcollection');
 	var newchecklist = {
@@ -24,6 +24,16 @@ router.post('/create', function(req, res) {
 	});
 });
 
+// delete list
+router.post('/:id/delete', function(req, res) {
+	var collection = req.db.get('listcollection');
+	var id = req.params.id;
+	collection.remove({"_id": id}, function(e, list) {
+		return res.redirect('/');
+	});
+});
+
+// diplay list 
 router.get('/:id', function(req, res) {
 	var collection = req.db.get('listcollection');
 	var id = req.params.id;
@@ -49,22 +59,38 @@ router.post('/:id/add', function(req, res) {
 	});
 });
 
+// delete item
+router.post('/:id/:itemid/delete', function(req, res) {
+	var collection = req.db.get('listcollection');
+	var id = req.params.id;
+	var itemid = req.params.itemid;
+	collection.findById(id, {}, function(e, list){
+		for (var i = 0; i < list.items.length; i++) {			
+			if (list.items[i].itemid == itemid) {
+				var itemlist = list.items;
+				var deleteditem = itemlist.splice(i,1);
+				console.log(itemlist);
+				collection.update({"_id": id}, { $set: {"items": itemlist} }, function(e, list) {
+					return res.redirect('/' + id);
+				});
+				break;
+			}
+		}
+	});
+});
+
 // update checkbox
 router.post('/:id/:itemid/:check', function(req, res) {
 	var collection = req.db.get('listcollection');
 	var id = req.params.id;
 	var itemid = req.params.itemid;
 	var checkstatus = (req.params.check === "true");
-	console.log("checkstatus");
-	console.log(checkstatus);
 
 	collection.findById(id, {}, function(e, list){
 		for (var i = 0; i < list.items.length; i++) {
 			if (list.items[i].itemid == itemid) {
 				var change = {};
 				change["items." + i + ".checked"] = checkstatus;
-				console.log("change");	
-				console.log(change); 
 				collection.update({"_id": id}, { $set: change }, function(e, list) {
 					return res.redirect('/' + id);
 				});
@@ -73,5 +99,6 @@ router.post('/:id/:itemid/:check', function(req, res) {
 		}
 	});
 });
+
 
 module.exports = router;
