@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var swig = require('swig');
 
+
 // New Code
 var mongo = require('mongodb');
 var monk = require('monk');
@@ -15,6 +16,16 @@ var routes = require('./routes/index');
 
 var app = express();
 
+var io = require('socket.io')();
+app.io = io;
+////////////////////////////////////////////////
+io.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+});
+/////////////////////////////////////////////////
 app.engine('html', swig.renderFile);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,6 +42,12 @@ swig.setDefaults({ cache: false });
 // Make our db accessible to our router
 app.use(function(req,res,next){
     req.db = db;
+    next();
+});
+
+// Make our io accessible to our router
+app.use(function(req,res,next){
+    req.io = io;
     next();
 });
 
