@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 	<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 	<script src="/javascripts/client.js"></script>
 	<title>Checklist - {{ name }}</title>
@@ -13,8 +14,8 @@
 	</form>
 	<div data-listid="{{ _id.toString() }}">
 		{% for item in items %}
-			<div>
-				<input type="checkbox" data-itemid="{{ item.itemid.toString() }}" {% if item.checked %} checked {% endif %}> {{ item.itemname }}
+			<div data-itemid="{{ item.itemid.toString() }}">
+				<input type="checkbox" {% if item.checked %} checked {% endif %}> {{ item.itemname }}
 				<form action="/{{ _id.toString() }}/{{ item.itemid.toString() }}/delete" method="post">
 					<input type="submit" value="Delete">
 				</form>
@@ -22,5 +23,37 @@
 		{% endfor %}
 	</div>
 	<a href="/">Back to Menu</a>
+	<script>
+	  var socket = io.connect('http://localhost:3000');
+
+	  socket.on('item_checked', function (itemid, checkstatus) {	    
+	    $('[data-itemid="' + itemid + '"]').find('input[type=checkbox]').attr('checked', checkstatus);
+	  });
+
+	  socket.on('item_deleted', function (itemid) {
+	    $('[data-itemid="' + itemid + '"]').remove();
+	  });
+
+	  socket.on('item_added', function (newitem, listid) {
+	    var $item = $('<div>')
+	    			.attr('data-itemid', newitem.itemid);
+	    var $input = $('<input>')
+	    			.attr('type', 'checkbox')
+	    			.appendTo($item);
+	    var $itemName = $('<span>')
+	    			.text(newitem.itemname)
+	    			.appendTo($item);
+	    var $itemform = $('<form>')
+	    				.attr('action', '/'+ listid + '/' + newitem.itemid + '/delete')
+	    				.attr('method', 'post');
+	    var $inputbutton = $('<input type="submit" value="Delete">')
+	    					.appendTo($itemform);
+
+	    $itemform.appendTo($item);
+
+	    $item.appendTo($('[data-listid="' + listid + '"]'));
+		    
+	  });	  
+	</script>
 </body>
 </html>

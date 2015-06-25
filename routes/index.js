@@ -33,12 +33,11 @@ router.post('/:id/delete', function(req, res) {
 	});
 });
 
-// diplay list 
+// display list 
 router.get('/:id', function(req, res) {
 	var collection = req.db.get('listcollection');
 	var id = req.params.id;
 	collection.findById(id, {}, function(e, list){
- 		console.log("FOUND:", list);
  		res.render('list', list); 
     });		
 });
@@ -54,7 +53,8 @@ router.post('/:id/add', function(req, res) {
 		"itemid": itemid
 	};
 	
-	collection.update({"_id": id}, {$push: {"items": newitem}}, function(e, list) {
+	collection.update({"_id": id}, {$push: {"items": newitem}}, function(e, number_updated) {
+		req.io.emit('item_added', newitem, id);
 		return res.redirect('/' + id);
 	});
 });
@@ -70,7 +70,8 @@ router.post('/:id/:itemid/delete', function(req, res) {
 				var itemlist = list.items;
 				var deleteditem = itemlist.splice(i,1);
 				console.log(itemlist);
-				collection.update({"_id": id}, { $set: {"items": itemlist} }, function(e, list) {
+				collection.update({"_id": id}, { $set: {"items": itemlist} }, function(e, number_updated) {
+					req.io.emit('item_deleted', itemid);
 					return res.redirect('/' + id);
 				});
 				break;
@@ -91,7 +92,8 @@ router.post('/:id/:itemid/:check', function(req, res) {
 			if (list.items[i].itemid == itemid) {
 				var change = {};
 				change["items." + i + ".checked"] = checkstatus;
-				collection.update({"_id": id}, { $set: change }, function(e, list) {
+				collection.update({"_id": id}, { $set: change }, function(e, number_updated) {
+					req.io.emit('item_checked', itemid, checkstatus);
 					return res.redirect('/' + id);
 				});
 				break;
@@ -99,6 +101,5 @@ router.post('/:id/:itemid/:check', function(req, res) {
 		}
 	});
 });
-
 
 module.exports = router;

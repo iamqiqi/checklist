@@ -17,15 +17,13 @@ var routes = require('./routes/index');
 var app = express();
 
 var io = require('socket.io')();
+
 app.io = io;
-////////////////////////////////////////////////
+
 io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
+  console.log('connected');
 });
-/////////////////////////////////////////////////
+
 app.engine('html', swig.renderFile);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
