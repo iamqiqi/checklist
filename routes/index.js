@@ -20,6 +20,7 @@ router.post('/create', function(req, res) {
 		"items": []
 	};
 	collection.insert(newchecklist, function(e, list) {
+		req.io.emit('list_added', newchecklist, list._id);
 		return res.redirect('/' + list._id);
 	});
 });
@@ -29,6 +30,7 @@ router.post('/:id/delete', function(req, res) {
 	var collection = req.db.get('listcollection');
 	var id = req.params.id;
 	collection.remove({"_id": id}, function(e, list) {
+		req.io.emit('list_deleted', id);
 		return res.redirect('/');
 	});
 });

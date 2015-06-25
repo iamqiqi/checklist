@@ -3,16 +3,16 @@
 <head>
 	<title>{{ title }}</title>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
 	<form action="/create" method="post">
 		<input type="text" name="list_name">
 		<input type="submit" value="create new">		
 	</form>
-	<div>
+	<div class="list">
 		{% for list in checklists %}
-			<div>
+			<div data-listid={{ list._id.toString() }}>
 				<a href="/{{list._id.toString()}}">{{ list.name }}</a>
 				<form action="/{{list._id.toString()}}/delete" method="post">
 					<input type="submit" value="Delete">
@@ -22,9 +22,30 @@
 	</div>
 	<script>
 	  var socket = io.connect('http://localhost:3000');
-	  socket.on('news', function (data) {
-	    console.log(data);
-	    socket.emit('my other event', { my: 'data' });
+
+	  socket.on('list_deleted', function (listid) {
+	    $('[data-listid="' + listid + '"]').remove();
+	  });
+
+	  socket.on('list_added', function (newlist, listid) {
+	    var $list = $('<div>')
+	    			.attr('data-listid', newlist._id);
+
+	    var $href = $('<a>')
+	    			.attr('href', '/' + newlist._id)
+	    			.text(newlist.name)
+	    			.appendTo($list);
+
+	    var $listform = $('<form>')
+	    				.attr('action', '/'+ listid + '/delete')
+	    				.attr('method', 'post');
+	    var $inputbutton = $('<input type="submit" value="Delete">')
+	    					.appendTo($listform);
+
+	    $listform.appendTo($list);
+
+	    $list.appendTo($('.list'));
+		    
 	  });
 	</script>	
 </body>
